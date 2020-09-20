@@ -1,0 +1,8 @@
+apiVersion: egressip.kaiserpfalz-edv.de/v1alpha1
+kind: EgressIPFailureDomain
+metadata:
+  name: egressipfailuredomain-sample
+spec:
+  cidr: 10.231.20.0/22
+  nodeSelector:
+    node-role.kubernetes.io/compute: ""

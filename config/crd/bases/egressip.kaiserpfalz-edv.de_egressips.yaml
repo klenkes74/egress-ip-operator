@@ -1,0 +1,110 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: egressips.egressip.kaiserpfalz-edv.de
+spec:
+  group: egressip.kaiserpfalz-edv.de
+  names:
+    kind: EgressIP
+    listKind: EgressIPList
+    plural: egressips
+    singular: egressip
+  scope: Namespaced
+  subresources:
+    status: { }
+  validation:
+    openAPIV3Schema:
+      description: EgressIP is the Schema for the egressips API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: EgressIPSpec defines the desired state of EgressIP
+          properties:
+            ips:
+              description: IPs is an array of defined EgressIPs. You may list all
+                defined failure domains. At least one needs to be listed.
+              items:
+                description: FailureDomainEgressIPSpec defines a single IP within
+                  a failureDomain
+                properties:
+                  failure-domain:
+                    description: FailureDomain is the defined failuredomain for this
+                      EgressIP. Needs to be defined prior to using it.
+                    type: string
+                  ip:
+                    description: IP is the IP that should be used for this EgressIP.
+                    pattern: \d+.\d+.\d+.\d+
+                    type: string
+                required:
+                  - failure-domain
+                type: object
+              minItems: 1
+              type: array
+              uniqueItems: true
+          required:
+            - ips
+          type: object
+        status:
+          description: EgressIPStatus defines the observed state of EgressIP
+          properties:
+            hostname:
+              description: HostName is the hostname this IP is assigned to
+              type: string
+            ip:
+              description: IP is the ip or cidr for this status.
+              properties:
+                failure-domain:
+                  description: FailureDomain is the defined failuredomain for this
+                    EgressIP. Needs to be defined prior to using it.
+                  type: string
+                ip:
+                  description: IP is the IP that should be used for this EgressIP.
+                  pattern: \d+.\d+.\d+.\d+
+                  type: string
+              required:
+                - failure-domain
+              type: object
+            message:
+              description: Message is a human readable message for this state.
+              type: string
+            phase:
+              description: Phase is the state of this message. May be pending, initializing,
+                failed, provisioned or deprovisioned
+              enum:
+                - pending
+                - initializing
+                - failed
+                - provisioned
+                - deprovisioned
+              type: string
+          required:
+            - phase
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: [ ]
+  storedVersions: [ ]

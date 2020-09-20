@@ -1,0 +1,58 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+    operators.operatorframework.io/builder: operator-sdk-v1.0.1
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
+  name: egress-ip-operator.vX.Y.Z
+  namespace: placeholder
+spec:
+  apiservicedefinitions: { }
+  customresourcedefinitions:
+    owned:
+      - description: EgressIP is the Schema for the egressips API
+        displayName: Egress IP
+        kind: EgressIP
+        name: egressips.egressip.kaiserpfalz-edv.de
+        version: v1alpha1
+      - description: FailureDomain is the Schema for the failuredomains API
+        displayName: Failure Domain
+        kind: FailureDomain
+        name: egressipfailuredomains.egressip.kaiserpfalz-edv.de
+        version: v1alpha1
+  description: Manages EgressIP with infrastructure
+  displayName: egress-ip-operator
+  icon:
+    - base64data: ""
+      mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - aws
+    - egressip
+    - southbound
+    - networking
+  links:
+    - name: Egress Ip Operator
+      url: https://egress-ip-operator.domain
+  maintainers:
+    - email: rlichti@kaiserpfalz-edv.de
+      name: Roland T. Lichti
+  maturity: alpha
+  provider:
+    name: Kaiserpfalz EDV-Service
+    url: https://kaiserpfalz-edv.de
+  version: 0.0.0

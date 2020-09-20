@@ -1,0 +1,8 @@
+apiVersion: egressip.kaiserpfalz-edv.de/v1alpha1
+kind: EgressIP
+metadata:
+  name: egressip-sample
+spec:
+  ips:
+    - failure-domain: egressipfailuredomain-sample
+      ip: 10.231.20.231
