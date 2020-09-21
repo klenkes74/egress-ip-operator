@@ -32,8 +32,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/klenkes74/egress-ip-operator/pkg/cloudprovider"
 	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/cloudmanaged_provisioner"
-	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_dynamic_provisioner"
-	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_static_provisioner"
+	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_provisioner"
 	"net"
 	"os"
 )
@@ -64,8 +63,8 @@ type EgressIPProvisioner interface {
 }
 
 var _ EgressIPProvisioner = &cloudmanaged_provisioner.CloudManagedEgressIPProvisioner{}
-var _ EgressIPProvisioner = &ocp_dynamic_provisioner.OcpDynamicEgressIPProvisioner{}
-var _ EgressIPProvisioner = &ocp_static_provisioner.OcpStaticEgressIPProvisioner{}
+var _ EgressIPProvisioner = &ocp_provisioner.OcpDynamicEgressIPProvisioner{}
+var _ EgressIPProvisioner = &ocp_provisioner.OcpStaticEgressIPProvisioner{}
 
 func NewEgressIPProvisioner(logger logr.Logger) (*EgressIPProvisioner, error) {
 	var result EgressIPProvisioner
@@ -92,12 +91,12 @@ func NewEgressIPProvisioner(logger logr.Logger) (*EgressIPProvisioner, error) {
 		}
 		result = EgressIPProvisioner(provider)
 	case "ocp-dynamic":
-		provider := &ocp_dynamic_provisioner.OcpDynamicEgressIPProvisioner{
+		provider := &ocp_provisioner.OcpDynamicEgressIPProvisioner{
 			Log: logger.WithName("ocp-dynamic"),
 		}
 		result = EgressIPProvisioner(provider)
 	case "ocp-static":
-		provider := &ocp_static_provisioner.OcpStaticEgressIPProvisioner{
+		provider := &ocp_provisioner.OcpStaticEgressIPProvisioner{
 			Log: logger.WithName("ocp-static"),
 		}
 		result = EgressIPProvisioner(provider)

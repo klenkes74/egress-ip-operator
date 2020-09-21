@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"github.com/go-logr/logr"
 	"github.com/klenkes74/egress-ip-operator/pkg/cloudprovider"
-	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_static_provisioner"
+	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_provisioner"
 	"net"
 )
 
@@ -30,7 +30,7 @@ type CloudManagedEgressIPProvisioner struct {
 	// Cloud is the low level interface to the cloudprovider for managing IPs on instances.
 	Cloud cloudprovider.CloudProvider
 	// OpenShift is the static Egress IP provisioner which is called internally for managing the OCP part of the IP management.
-	OpenShift ocp_static_provisioner.OcpStaticEgressIPProvisioner
+	OpenShift ocp_provisioner.OcpStaticEgressIPProvisioner
 }
 
 func (a CloudManagedEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string) (*net.IP, error) {

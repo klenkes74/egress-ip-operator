@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ocp_dynamic_provisioner
+package ocp_provisioner
 
 import (
 	"context"
