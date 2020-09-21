@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package ocp_provisioner_test
+package provisioner_test
 
 import (
-	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
-	"net"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	. "github.com/onsi/gomega"
 )
 
-var log = zap.New(zap.UseDevMode(true)).WithName("ocp_static_provisioner_test")
+//goland:noinspection GoNilness
+var _ = Describe("AssignCIDR", func() {
+	BeforeEach(func() {
+		initCloudManagedProvisionerMock()
+	})
 
-var (
-	mockCtrl *gomock.Controller
+	AfterEach(func() {
+		mockCtrl.Finish()
+	})
 
-	mainIP             *net.IP
-	ip                 *net.IP
-	hostName           string
-	hostId             string
-	networkInterfaceId string
-	maxIPsPerInstance  int
-)
+	It("should just return nil", func() {
+		err := cloudManagedProvisioner.AssignCIDR(ctx, hostName)
 
-func init() {
-}
-
-func initMock() {
-	mockCtrl = gomock.NewController(GinkgoT())
-}
+		Expect(err).To(BeNil())
+	})
+})

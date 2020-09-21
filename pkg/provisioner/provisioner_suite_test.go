@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ocp_provisioner
+package provisioner
 
 import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
@@ -24,10 +24,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestAwsCloudProvider(t *testing.T) {
+func TestProvisioner(t *testing.T) {
 	RegisterFailHandler(Fail)
 
 	RunSpecsWithDefaultAndCustomReporters(t,
-		"OCP Provisioner Suite",
+		"Provisioner Suite",
 		[]Reporter{printer.NewlineReporter{}})
 }

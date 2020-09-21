@@ -30,33 +30,32 @@
 // configured on the HostSubnet within OCP.
 //
 // In addition the cloudmanaged_provisioner uses the ocp_static_provisioner as backend to handle the OCP configuration.
-package ocp_provisioner
+package provisioner
 
 import (
 	"context"
+	"errors"
 	"github.com/go-logr/logr"
 	"net"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // The OcpStaticEgressIPProvisioner will manage the IP on the hosts by assigning free IPs from the failure-domain.
 type OcpStaticEgressIPProvisioner struct {
-	client.Client
+	Client OCPDirectCalls
 
 	Log logr.Logger
+}
+
+// AddSpecifiedIP assignes a random IP to the host specified by its hostname. The IP will be configured on the
+// HostSubnet of the matching host. The IP will be taken from any matching failure domain of the HostSubnet.
+func (o OcpStaticEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, error) {
+	return nil, errors.New("the static OpenShift provisioner does not implement AddRandomIP")
 }
 
 // AddSpecifiedIP assignes the specified IP to the host specified by its hostname. The IP will be configured on the
 // HostSubnet of the matching host.
 func (o OcpStaticEgressIPProvisioner) AddSpecifiedIP(ctx context.Context, ip *net.IP, hostName string) error {
 	// TODO 2020-09-19 rlichti implement AddSpecifiedIP in OcpStaticEgressIPProvisioner
-	panic("implement me")
-}
-
-// AddSpecifiedIP assignes a random IP to the host specified by its hostname. The IP will be configured on the
-// HostSubnet of the matching host. The IP will be taken from any matching failure domain of the HostSubnet.
-func (o OcpStaticEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string) (*net.IP, error) {
-	// TODO 2020-09-19 rlichti implement AddRandomIP in OcpStaticEgressIPProvisioner
 	panic("implement me")
 }
 
@@ -73,7 +72,7 @@ func (o OcpStaticEgressIPProvisioner) CheckIP(ctx context.Context, ip *net.IP, h
 
 // FindHostForNewIP selects the host within the failureDomain to get a new IP assigned to. Will give either a hostName
 // or an error if there are no eligible hosts within the specified failureDomain.
-func (o OcpStaticEgressIPProvisioner) FindHostForNewIP(ctx context.Context, failureDomain string) (string, error) {
+func (o OcpStaticEgressIPProvisioner) FindHostForNewIP(ctx context.Context, failureDomain string) (string, net.IP, error) {
 	// TODO 2020-09-19 rlichti implement FindHostForNewIP in OcpStaticEgressIPProvisioner
 	panic("implement me")
 }

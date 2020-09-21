@@ -1,4 +1,4 @@
-//go:generate go run github.com/golang/mock/mockgen -package ocp_provisioner_test -destination ./mock_ocp_directcalls_test.go github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_provisioner OCPDirectCalls
+//go:generate go run github.com/golang/mock/mockgen -package provisioner_test -destination ./mock_ocp_directcalls_test.go github.com/klenkes74/egress-ip-operator/pkg/provisioner OCPDirectCalls
 
 /*
  * Copyright 2020 Kaiserpfalz EDV-Service, Roland T. Lichti.
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package ocp_provisioner
+package provisioner
 
 import (
 	"context"
