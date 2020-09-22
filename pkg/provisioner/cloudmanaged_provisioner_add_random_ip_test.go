@@ -42,10 +42,10 @@ var _ = Describe("AssignRandomIP", func() {
 			AddSpecifiedIP(ctx, defaultAddedIP, hostName).
 			Return(nil)
 
-		ip, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName)
+		ip, host, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName, defaultFailureDomain)
 
-		Expect(ip).ToNot(BeNil())
 		Expect(ip.String()).To(Equal(defaultAddedIP.String()))
+		Expect(host).To(Equal(hostName))
 		Expect(err).To(BeNil())
 	})
 
@@ -60,9 +60,10 @@ var _ = Describe("AssignRandomIP", func() {
 			AddRandomIP(hostName).
 			Return(nil, expectedErr)
 
-		ip, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName)
+		ip, host, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName, defaultFailureDomain)
 
 		Expect(ip).To(BeNil())
+		Expect(host).To(Equal(hostName))
 		Expect(err).To(MatchError(expectedErr))
 	})
 
@@ -81,9 +82,10 @@ var _ = Describe("AssignRandomIP", func() {
 			RemoveIP(defaultAddedIP, hostName).
 			Return(nil)
 
-		ip, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName)
+		ip, host, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName, defaultFailureDomain)
 
 		Expect(ip).To(BeNil())
+		Expect(host).To(Equal(hostName))
 		Expect(err).To(MatchError(expectedErr))
 	})
 
@@ -108,9 +110,10 @@ var _ = Describe("AssignRandomIP", func() {
 			RemoveIP(defaultAddedIP, hostName).
 			Return(cloudProviderErr)
 
-		ip, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName)
+		ip, host, err := cloudManagedProvisioner.AddRandomIP(ctx, hostName, defaultFailureDomain)
 
 		Expect(ip).To(BeNil())
+		Expect(host).To(Equal(hostName))
 		Expect(err).To(MatchError(expectedErr))
 	})
 })

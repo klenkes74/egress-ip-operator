@@ -34,7 +34,7 @@ func (o OcpDynamicEgressIPProvisioner) AssignCIDR(ctx context.Context, hostName 
 	panic("implement me")
 }
 
-func (o OcpDynamicEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, error) {
+func (o OcpDynamicEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, string, error) {
 	// TODO 2020-09-19 rlichti Implement the AddRandomIP for dynamic provisioner. Need to find a free IP in the failure-domain and return it to the caller.
 	panic("implement me")
 }

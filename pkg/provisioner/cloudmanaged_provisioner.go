@@ -32,27 +32,27 @@ type CloudManagedEgressIPProvisioner struct {
 	OpenShift EgressIPProvisioner
 }
 
-func (a CloudManagedEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, error) {
+func (a CloudManagedEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, string, error) {
 	ip, err := a.Cloud.AddRandomIP(hostName)
 	if err != nil {
-		return nil, err
+		return nil, hostName, err
 	}
 
 	err = a.OpenShift.AddSpecifiedIP(ctx, ip, hostName)
 	if err != nil {
 		redoErr := a.Cloud.RemoveIP(ip, hostName)
 		if redoErr != nil {
-			return nil, fmt.Errorf(
+			return nil, hostName, fmt.Errorf(
 				"error while rolling back adding random ip to host '%v': %v",
 				hostName,
 				err.Error(),
 			)
 		}
 
-		return nil, err
+		return nil, hostName, err
 	}
 
-	return ip, err
+	return ip, hostName, err
 }
 
 func (a CloudManagedEgressIPProvisioner) AddSpecifiedIP(ctx context.Context, ip *net.IP, hostName string) error {

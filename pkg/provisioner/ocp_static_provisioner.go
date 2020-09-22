@@ -34,8 +34,9 @@ package provisioner
 
 import (
 	"context"
-	"errors"
 	"github.com/go-logr/logr"
+	v1 "github.com/openshift/api/network/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"net"
 )
 
@@ -48,8 +49,40 @@ type OcpStaticEgressIPProvisioner struct {
 
 // AddSpecifiedIP assignes a random IP to the host specified by its hostname. The IP will be configured on the
 // HostSubnet of the matching host. The IP will be taken from any matching failure domain of the HostSubnet.
-func (o OcpStaticEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, error) {
-	return nil, errors.New("the static OpenShift provisioner does not implement AddRandomIP")
+func (o OcpStaticEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, string, error) {
+	hostName, ip, err := o.FindHostForNewIP(ctx, failureDomain)
+	if err != nil {
+		return nil, hostName, err
+	}
+
+	hostSubnet, err := o.loadHostSubNet(ctx, hostName)
+	if err != nil {
+		return nil, hostName, err
+	}
+
+	hostSubnet.EgressIPs = append(hostSubnet.EgressIPs, ip.String())
+
+	return &ip, hostName, o.Client.Update(ctx, hostSubnet)
+}
+
+func (o OcpStaticEgressIPProvisioner) loadHostSubNet(ctx context.Context, hostName string) (*v1.HostSubnet, error) {
+	name := o.createNamespacedForHostSubnet(hostName)
+
+	hostSubNet := &v1.HostSubnet{}
+	err := o.Client.Get(ctx, *name, hostSubNet)
+	if err != nil {
+		return nil, err
+	}
+
+	return hostSubNet, nil
+}
+
+func (o OcpStaticEgressIPProvisioner) createNamespacedForHostSubnet(hostName string) *types.NamespacedName {
+	name := types.NamespacedName{
+		Namespace: "",
+		Name:      hostName,
+	}
+	return &name
 }
 
 // AddSpecifiedIP assignes the specified IP to the host specified by its hostname. The IP will be configured on the

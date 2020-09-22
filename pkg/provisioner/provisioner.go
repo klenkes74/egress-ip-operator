@@ -42,7 +42,7 @@ type EgressIPProvisioner interface {
 	AddSpecifiedIP(ctx context.Context, ip *net.IP, hostName string) error
 	// AddRandomIP adds a random IP to the specified host.
 	// It will return the IP or the error.
-	AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, error)
+	AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, string, error)
 	// FindHostForNewIP searches for a host in the failure domain to add an IP to.
 	// Will return the hostname or an error.
 	FindHostForNewIP(ctx context.Context, failureDomain string) (string, net.IP, error)
