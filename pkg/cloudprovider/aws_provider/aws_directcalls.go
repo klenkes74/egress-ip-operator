@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package aws_provider_test -destination ./mock_aws_directcalls_test.go github.com/klenkes74/egress-ip-operator/pkg/cloudprovider/aws_provider AwsDirectCalls
+
 /*
  * Copyright 2020 Kaiserpfalz EDV-Service, Roland T. Lichti.
  *

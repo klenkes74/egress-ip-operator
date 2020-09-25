@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package cloudmanaged_provisioner
+package provisioner
 
 import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
 	"github.com/klenkes74/egress-ip-operator/pkg/cloudprovider"
-	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_static_provisioner"
 	"net"
 )
 
@@ -30,30 +29,30 @@ type CloudManagedEgressIPProvisioner struct {
 	// Cloud is the low level interface to the cloudprovider for managing IPs on instances.
 	Cloud cloudprovider.CloudProvider
 	// OpenShift is the static Egress IP provisioner which is called internally for managing the OCP part of the IP management.
-	OpenShift ocp_static_provisioner.OcpStaticEgressIPProvisioner
+	OpenShift EgressIPProvisioner
 }
 
-func (a CloudManagedEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string) (*net.IP, error) {
+func (a CloudManagedEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, string, error) {
 	ip, err := a.Cloud.AddRandomIP(hostName)
 	if err != nil {
-		return nil, err
+		return nil, hostName, err
 	}
 
 	err = a.OpenShift.AddSpecifiedIP(ctx, ip, hostName)
 	if err != nil {
 		redoErr := a.Cloud.RemoveIP(ip, hostName)
 		if redoErr != nil {
-			return nil, fmt.Errorf(
+			return nil, hostName, fmt.Errorf(
 				"error while rolling back adding random ip to host '%v': %v",
 				hostName,
 				err.Error(),
 			)
 		}
 
-		return nil, err
+		return nil, hostName, err
 	}
 
-	return ip, err
+	return ip, hostName, err
 }
 
 func (a CloudManagedEgressIPProvisioner) AddSpecifiedIP(ctx context.Context, ip *net.IP, hostName string) error {
@@ -73,6 +72,8 @@ func (a CloudManagedEgressIPProvisioner) AddSpecifiedIP(ctx context.Context, ip 
 				err.Error(),
 			)
 		}
+
+		return err
 	}
 
 	return nil
@@ -91,7 +92,7 @@ func (a CloudManagedEgressIPProvisioner) CheckIP(ctx context.Context, ip *net.IP
 	return a.OpenShift.CheckIP(ctx, ip, hostName)
 }
 
-func (a CloudManagedEgressIPProvisioner) FindHostForNewIP(ctx context.Context, failureDomain string) (string, error) {
+func (a CloudManagedEgressIPProvisioner) FindHostForNewIP(ctx context.Context, failureDomain string) (string, net.IP, error) {
 	return a.OpenShift.FindHostForNewIP(ctx, failureDomain)
 }
 
@@ -124,7 +125,7 @@ func (a CloudManagedEgressIPProvisioner) RemoveIP(ctx context.Context, ip *net.I
 	if err != nil {
 		redoErr := a.Cloud.AddSpecifiedIP(ip, hostName)
 		if redoErr != nil {
-			return fmt.Errorf("error while removing IP '%v' from OpenShift. Re-adding it to the cloudprovider failed: %v", ip.String(), redoErr.Error())
+			return fmt.Errorf("error while removing IP '%v' from OpenShiftProvisioner. Re-adding it to the cloudprovider failed: %v", ip.String(), redoErr.Error())
 		}
 
 		return fmt.Errorf("error while removing IP '%v' from host. IP is still valid: %v", ip.String(), err.Error())

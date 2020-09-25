@@ -25,7 +25,7 @@ import (
 type EgressIPFailureDomainSpec struct {
 	// +kubebuilder:validation:Pattern=\d+.\d+.\d+.\d+/\d+
 	// Network is the CIDR of the network. Only needed for provisioner 'operator'
-	Cidr         string              `json:"cidr,omitempty"`
+	Cidr string `json:"cidr,omitempty"`
 	// NodeSelector is the nodeselector of all nodes eligible to get egress ips assigned to.
 	NodeSelector corev1.NodeSelector `json:"nodeSelector,omitempty"`
 }

@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package cloudprovider -destination ./mock_cloudprovider.go github.com/klenkes74/egress-ip-operator/pkg/cloudprovider CloudProvider
+
 /*
  * Copyright 2020 Kaiserpfalz EDV-Service, Roland T. Lichti.
  *

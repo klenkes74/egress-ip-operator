@@ -1,4 +1,4 @@
-//go:generate go run github.com/golang/mock/mockgen -package provisioner_test -destination ./mock_provisioner_test.go github.com/klenkes74/egress-ip-operator/pkg/provisioner EgressIPProvisioner
+//go:generate go run github.com/golang/mock/mockgen -package provisioner -destination ./mock_provisioner.go github.com/klenkes74/egress-ip-operator/pkg/provisioner EgressIPProvisioner
 
 /*
  * Copyright 2020 Kaiserpfalz EDV-Service, Roland T. Lichti.
@@ -19,9 +19,9 @@
 // provisioner contains the low level provisioners for handling the IP provisioning.
 //
 // Currently there are three strategies defined:
-// - 'aws' - the operator will call AWS for random IP assignement.
+// - 'aws' - the operator will call AWS for random IP assignment.
 // - 'ocp-static' - the operator will manage which IPs are configured on which node.
-// - 'ocp-dynamic' - the operator will add the CIDR range to all matching hosts and OpenShift will manage the host
+// - 'ocp-dynamic' - the operator will add the CIDR range to all matching hosts and OpenShiftProvisioner will manage the host
 //   IP networking.
 package provisioner
 
@@ -31,24 +31,21 @@ import (
 	"fmt"
 	"github.com/go-logr/logr"
 	"github.com/klenkes74/egress-ip-operator/pkg/cloudprovider"
-	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/cloudmanaged_provisioner"
-	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_dynamic_provisioner"
-	"github.com/klenkes74/egress-ip-operator/pkg/provisioner/ocp_static_provisioner"
 	"net"
 	"os"
 )
 
 // EgressIPProvisioner is the low level IP manager for
 type EgressIPProvisioner interface {
-	// FindHostForNewIP searches for a host in the failure domain to add an IP to.
-	// Will return the hostname or an error.
-	FindHostForNewIP(ctx context.Context, failureDomain string) (string, error)
 	// AddSpecifiedIP adds a predefined IP to the specified host.
 	// It will return an error or nil.
 	AddSpecifiedIP(ctx context.Context, ip *net.IP, hostName string) error
 	// AddRandomIP adds a random IP to the specified host.
 	// It will return the IP or the error.
-	AddRandomIP(ctx context.Context, hostName string) (*net.IP, error)
+	AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, string, error)
+	// FindHostForNewIP searches for a host in the failure domain to add an IP to.
+	// Will return the hostname or an error.
+	FindHostForNewIP(ctx context.Context, failureDomain string) (string, net.IP, error)
 	// RemoveIP will remove the given IP from the specified host.
 	// It will return an error or nil.
 	RemoveIP(ctx context.Context, ip *net.IP, hostName string) error
@@ -63,9 +60,9 @@ type EgressIPProvisioner interface {
 	AssignCIDR(ctx context.Context, hostName string) error
 }
 
-var _ EgressIPProvisioner = &cloudmanaged_provisioner.CloudManagedEgressIPProvisioner{}
-var _ EgressIPProvisioner = &ocp_dynamic_provisioner.OcpDynamicEgressIPProvisioner{}
-var _ EgressIPProvisioner = &ocp_static_provisioner.OcpStaticEgressIPProvisioner{}
+var _ EgressIPProvisioner = &CloudManagedEgressIPProvisioner{}
+var _ EgressIPProvisioner = &OcpDynamicEgressIPProvisioner{}
+var _ EgressIPProvisioner = &OcpStaticEgressIPProvisioner{}
 
 func NewEgressIPProvisioner(logger logr.Logger) (*EgressIPProvisioner, error) {
 	var result EgressIPProvisioner
@@ -86,18 +83,18 @@ func NewEgressIPProvisioner(logger logr.Logger) (*EgressIPProvisioner, error) {
 		if err != nil {
 			return nil, err
 		}
-		provider := &cloudmanaged_provisioner.CloudManagedEgressIPProvisioner{
+		provider := &CloudManagedEgressIPProvisioner{
 			Cloud: *cloud,
 			Log:   logger,
 		}
 		result = EgressIPProvisioner(provider)
 	case "ocp-dynamic":
-		provider := &ocp_dynamic_provisioner.OcpDynamicEgressIPProvisioner{
+		provider := &OcpDynamicEgressIPProvisioner{
 			Log: logger.WithName("ocp-dynamic"),
 		}
 		result = EgressIPProvisioner(provider)
 	case "ocp-static":
-		provider := &ocp_static_provisioner.OcpStaticEgressIPProvisioner{
+		provider := &OcpStaticEgressIPProvisioner{
 			Log: logger.WithName("ocp-static"),
 		}
 		result = EgressIPProvisioner(provider)

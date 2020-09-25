@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package ocp_dynamic_provisioner
+package provisioner
 
 import (
 	"context"
 	"github.com/go-logr/logr"
 	"net"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // OcpDynamicEgressIPProvisioner is basically a no-op provisioner since it only has to handle
 type OcpDynamicEgressIPProvisioner struct {
-	client.Client
+	Client OCPDirectCalls
 
 	Log logr.Logger
 }
@@ -35,21 +34,21 @@ func (o OcpDynamicEgressIPProvisioner) AssignCIDR(ctx context.Context, hostName 
 	panic("implement me")
 }
 
-func (o OcpDynamicEgressIPProvisioner) AddSpecifiedIP(_ context.Context, _ *net.IP, _ string) error {
-	return nil
-}
-
-func (o OcpDynamicEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string) (*net.IP, error) {
+func (o OcpDynamicEgressIPProvisioner) AddRandomIP(ctx context.Context, hostName string, failureDomain string) (*net.IP, string, error) {
 	// TODO 2020-09-19 rlichti Implement the AddRandomIP for dynamic provisioner. Need to find a free IP in the failure-domain and return it to the caller.
 	panic("implement me")
+}
+
+func (o OcpDynamicEgressIPProvisioner) AddSpecifiedIP(_ context.Context, _ *net.IP, _ string) error {
+	return nil
 }
 
 func (o OcpDynamicEgressIPProvisioner) CheckIP(_ context.Context, _ *net.IP, _ string) error {
 	return nil
 }
 
-func (o OcpDynamicEgressIPProvisioner) FindHostForNewIP(_ context.Context, _ string) (string, error) {
-	return "-no host needed-", nil
+func (o OcpDynamicEgressIPProvisioner) FindHostForNewIP(_ context.Context, _ string) (string, net.IP, error) {
+	return "-no host needed-", nil, nil
 }
 
 func (o OcpDynamicEgressIPProvisioner) MoveIP(_ context.Context, ip *net.IP, _ string, _ string) error {
